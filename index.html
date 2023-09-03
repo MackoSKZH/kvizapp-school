@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test</title>
+        <link rel="Website Icon" type="png" href="https://cdn-icons-png.flaticon.com/512/1581/1581884.png">
+        <link rel="stylesheet" type="text/css" href="./style.css">
+
+</head>
+<body>
+    <div class="content" method="get">
+        <form id="kviz">
+            
+            <div class="alert"></div><!--Show name-->
+
+            <img id="myimg"> 
+
+            <div class="inputBox" id="name-input">
+                <input type="text" id="name" placeholder="Meno Priezvisko">
+            </div>
+
+            <div class="inputBox" id="test-input">
+                <input type="text" id="teacher-name" placeholder="Meno profesora">
+            </div>
+
+            <div class="inputBox" id="test-input">
+                <input type="text" id="test-number" placeholder="Test">
+            </div>
+
+            <div class="submit-button" id="name-button-div">
+                <button type="button" id="submit-name">Prihlásiť sa</button>
+            </div>
+
+            <div class="inputBox" id="answer-input" style="display: none;">
+                <input type="text" id="answer" placeholder="Zadajte odpoveď">
+            </div>
+            
+            <div class="submit-button" id="answer-button-div" style="display: none;">
+                <button type="submit" id="submit-answers">Submit</button>
+            </div>
+
+        </form>
+
+        <div id="made-by">Made by: @mhronsky</div>
+    </div>
+
+    <script type="module">
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.2.0/firebase-app.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC7kTs7_9a9nm0J7zXyhscnLe6W4C2ITmg",
+            authDomain: "kvizapp-school.firebaseapp.com",
+            databaseURL: "https://kvizapp-school-default-rtdb.firebaseio.com",
+            projectId: "kvizapp-school",
+            storageBucket: "kvizapp-school.appspot.com",
+            messagingSenderId: "671960737010",
+            appId: "1:671960737010:web:a66fd2850a69cce3b21c6b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+
+        import {getDatabase, ref, set, child, update, remove, onValue, get}
+        from "https://www.gstatic.com/firebasejs/10.2.0/firebase-database.js"
+
+        import { getStorage, ref as sRef, uploadBytesResumable, getDownloadURL } 
+            from "https://www.gstatic.com/firebasejs/10.2.0/firebase-storage.js"
+
+        import { getFirestore, doc, getDoc, setDoc, collection, addDoc }
+        from "https://www.gstatic.com/firebasejs/10.2.0/firebase-firestore.js";
+        const clouddb = getFirestore();
+
+        const db = getDatabase();
+
+        var myimg = document.getElementById("myimg");
+        var namebox = document.getElementById("name");
+        var rollbox = document.getElementById("test-number");
+        var teacherName = document.getElementById("teacher-name")
+        var answerbox = document.getElementById("answer");
+        var nameBtn = document.getElementById("submit-name");
+        var subBtn = document.getElementById("submit-answers");
+//-------------------------------PROCESS--------------------------------------//
+        function InsertData(){
+            if (namebox.value != "" && rollbox.value != "" && teacherName.value != ""){
+
+                
+
+                set(ref(db, "Teachers/"+teacherName.value+"/Testy/"+rollbox.value),{
+                    MenoZiaka: namebox.value,
+
+                })
+                .then(()=>{
+                    alert("data stored succesfully");
+                    document.getElementById("answer-input").style.display = "block";
+                    document.getElementById("answer-button-div").style.display = "block";
+                    document.getElementById("test-input").style.display = "block";
+                    document.getElementById("answer-button-div").style.display = "block";
+                    document.getElementById("name-input").style.display = "none";
+                    document.getElementById("name-button-div").style.display = "none";
+                    document.getElementById("test-number").style.display = "none";
+                    document.getElementById("teacher-name").style.display = "none";
+                    document.querySelector(".alert").style.display = 'block';
+
+                    var messageSentDiv = document.querySelector(".alert");
+                    messageSentDiv.textContent = namebox.value;
+
+                    GetImagefromFirestore();
+                })
+                .catch((error)=>{
+                    alert("unsuccesful, error"+error);
+                });
+            } else {
+                alert("insert all data!");
+            };
+        }
+
+        async function GetImagefromFirestore(){
+            var imageName = "pes";
+            var ref = doc(clouddb, "ImageLinks"+rollbox.value+"/"+imageName);
+            const docSnap = await getDoc(ref);
+
+            if(docSnap.exists()){
+                myimg.src = docSnap.data().ImageURL;
+            }
+            document.getElementById("myimg").style.display = "block";
+        }
+
+        nameBtn.addEventListener("click", InsertData);
+    </script>
+</body>
+</html>

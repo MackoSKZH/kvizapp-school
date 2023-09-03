@@ -1,0 +1,98 @@
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#myimg {
+    height: 300px;
+    width: 300px;
+    margin:0 auto;
+    display: flex;
+    border: none;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    display: none;
+}
+
+#name-input,
+#test-input,
+#name-button-div,
+#answer-input,
+#answer-button-div {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.inputBox input,
+#answer-input input {
+    width: 80%;
+    height: 50px;
+    border: none;
+    text-align: center;
+    border-radius: 10px;
+    margin: 10px auto;
+    padding: 10px;
+    font-size: 20px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.submit-button button,
+#answer-button-div button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    background-color: #4CAF50;
+    color: #fff;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+#submit-button:hover {
+    background-color: #3e8e41;
+}
+
+.alert {
+    width: 80%;
+    height: 20px;
+    margin: 0 auto;
+    margin-bottom: 10px;
+    border: none;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 20px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    display: none;
+}
+
+#made-by {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    font-size: 7px;
+    color: #999;
+}
