@@ -2,53 +2,64 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test</title>
-        <link rel="Website Icon" type="png" href="https://cdn-icons-png.flaticon.com/512/1581/1581884.png">
-        <link rel="stylesheet" type="text/css" href="./style.css">
-
+    <title>Učiteľ kviz</title>
+    <link rel="Website Icon" type="png" href="https://cdn-icons-png.flaticon.com/512/1581/1581884.png">
+    <link rel="stylesheet" type="text/css" href="./style.css">
 </head>
+
 <body>
-    <div class="content" method="get">
-        <form id="kviz">
-            
-            <div class="alert"></div><!--Show name-->
+        <div id="username" style="display: none;">
+            <label id="username"></label>
+        </div>
 
-            <img id="myimg"> 
 
-            <div class="inputBox" id="name-input">
-                <input type="text" id="name" placeholder="Meno Priezvisko">
-            </div>
+    <div id="loginTeacher">
+        <div id="first-page">
+            <input type="text" id="teacher-name" placeholder="Prihlasovacie meno">
+        
+            <input type="text" id="teacher-code" placeholder="Prihlasovací kód">
 
-            <div class="inputBox" id="test-input">
-                <input type="text" id="teacher-name" placeholder="Meno profesora">
-            </div>
-
-            <div class="inputBox" id="test-input">
-                <input type="text" id="test-number" placeholder="Test">
-            </div>
-
-            <div class="submit-button" id="name-button-div">
-                <button type="button" id="submit-name">Prihlásiť sa</button>
-            </div>
-
-            <div class="inputBox" id="answer-input" style="display: none;">
-                <input type="text" id="answer" placeholder="Zadajte odpoveď">
-            </div>
-            
-            <div class="submit-button" id="answer-button-div" style="display: none;">
-                <button type="submit" id="submit-answers">Submit</button>
-            </div>
-
-        </form>
-
-        <div id="made-by">Made by: @mhronsky</div>
+            <button id="logbtn">Prihlásiť sa</button>
+        </div>
     </div>
 
+    <div class="second-page" id="imageUpload" style="display: none;">
+        <div id="label" style="display: none;">
+            <label for="namebox">Názov obrázka</label>
+        </div>
+        
+
+        <div class="imgname-container" style="display: none;">
+            <div id="imgname">
+                <input type="text" id="namebox" placeholder="Zmeniť názov obrázku" style="display: none;"> 
+                <label id="extlab" style="display: none;"></label> 
+                <div>
+                    <input type="text" id="testname" placeholder="Názov testu">
+                </div>
+            </div>
+        </div>
+
+        <img id="myimg"> 
+
+        <label id="upprogress"></label> 
+
+        <div class="button-container"  style="display: none;">
+            <button id="selbtn">Vybrať obrázok</button>
+            <button id="upbtn">Nahrať obrázok</button>
+        </div>
+
+
+
+    </div>
+
+    <div id="made-by">Made by: @mhronsky</div>
+    
     <script type="module">
 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.2.0/firebase-app.js";
-
+        
         const firebaseConfig = {
             apiKey: "AIzaSyC7kTs7_9a9nm0J7zXyhscnLe6W4C2ITmg",
             authDomain: "kvizapp-school.firebaseapp.com",
@@ -59,74 +70,166 @@
             appId: "1:671960737010:web:a66fd2850a69cce3b21c6b"
         };
 
+        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
-
-        import {getDatabase, ref, set, child, update, remove, onValue, get}
-        from "https://www.gstatic.com/firebasejs/10.2.0/firebase-database.js"
 
         import { getStorage, ref as sRef, uploadBytesResumable, getDownloadURL } 
             from "https://www.gstatic.com/firebasejs/10.2.0/firebase-storage.js"
 
+        // CLoud Firestore Database
         import { getFirestore, doc, getDoc, setDoc, collection, addDoc }
         from "https://www.gstatic.com/firebasejs/10.2.0/firebase-firestore.js";
-        const clouddb = getFirestore();
 
+        import {getDatabase, ref, get, set, child, update, remove}
+        from "https://www.gstatic.com/firebasejs/10.2.0/firebase-database.js";
+        const clouddb = getFirestore();
+        
         const db = getDatabase();
 
+//--------------------------VARIABLES & REFERENCES------------------------------//
+        var files = [];
+        var reader = new FileReader();
+
+        var namebox = document.getElementById("namebox");
+        var extlabel = document.getElementById("extlab");
         var myimg = document.getElementById("myimg");
-        var namebox = document.getElementById("name");
-        var rollbox = document.getElementById("test-number");
-        var teacherName = document.getElementById("teacher-name")
-        var answerbox = document.getElementById("answer");
-        var nameBtn = document.getElementById("submit-name");
-        var subBtn = document.getElementById("submit-answers");
-//-------------------------------PROCESS--------------------------------------//
-        function InsertData(){
-            if (namebox.value != "" && rollbox.value != "" && teacherName.value != ""){
+        var proglab = document.getElementById("upprogress");
+        var SelBtn = document.getElementById("selbtn");
+        var UpBtn = document.getElementById("upbtn");
 
-                
+        var teacher = document.getElementById("teacher-name");
+        var Tcode = document.getElementById("teacher-code");
+        var LogBtn = document.getElementById("logbtn");
 
-                set(ref(db, "Teachers/"+teacherName.value+"/Testy/"+rollbox.value),{
-                    MenoZiaka: namebox.value,
+        var testname = document.getElementById("testname");
 
-                })
-                .then(()=>{
-                    alert("data stored succesfully");
-                    document.getElementById("answer-input").style.display = "block";
-                    document.getElementById("answer-button-div").style.display = "block";
-                    document.getElementById("test-input").style.display = "block";
-                    document.getElementById("answer-button-div").style.display = "block";
-                    document.getElementById("name-input").style.display = "none";
-                    document.getElementById("name-button-div").style.display = "none";
-                    document.getElementById("test-number").style.display = "none";
-                    document.getElementById("teacher-name").style.display = "none";
-                    document.querySelector(".alert").style.display = 'block';
+        var input = document.createElement("input");
+        input.type = "file";
 
-                    var messageSentDiv = document.querySelector(".alert");
-                    messageSentDiv.textContent = namebox.value;
-
-                    GetImagefromFirestore();
-                })
-                .catch((error)=>{
-                    alert("unsuccesful, error"+error);
-                });
-            } else {
-                alert("insert all data!");
-            };
-        }
-
-        async function GetImagefromFirestore(){
-            var imageName = "pes";
-            var ref = doc(clouddb, "ImageLinks"+rollbox.value+"/"+imageName);
-            const docSnap = await getDoc(ref);
-
-            if(docSnap.exists()){
-                myimg.src = docSnap.data().ImageURL;
-            }
+        input.onchange = e => {
             document.getElementById("myimg").style.display = "block";
+            document.getElementById("namebox").style.display = "block";
+            document.getElementById("label").style.display = "block";
+            files = e.target.files;
+
+            
+
+            var extention = GetFileExt(files[0]);
+            var name = GetFileName(files[0]);
+
+            namebox.value = name;
+            extlab.innerHTML = extention;
+
+            reader.readAsDataURL(files[0]);
         }
 
-        nameBtn.addEventListener("click", InsertData);
+        reader.onload = function(){
+            myimg.src = reader.result;
+        }
+
+        SelBtn.onclick = function(){
+            input.click();
+        }
+
+        function GetFileExt(file){
+            var temp = file.name.split(".");
+            var ext = temp.slice((temp.length-1), (temp.length));
+            return "."+ ext[0];
+        }
+
+        function GetFileName(file){
+            var temp = file.name.split(".");
+            var fname = temp.slice(0,-1).join(".");
+            return fname;
+        }
+//-------------------------------UPLOAD PROCESS--------------------------------//     
+        async function UploadProcess() {
+            if(testname.value.length != 0){
+                var ImgToUpload = files[0];
+            
+                var ImgName = namebox.value + extlab.innerHTML;
+            
+                const metaData ={
+                    contentType: ImgToUpload.type
+                }
+            
+                const storage = getStorage();
+            
+                const storageRef = sRef(storage, teacher.value+"/"+ImgName); // File reference
+            
+                const UploadTask = uploadBytesResumable(storageRef, ImgToUpload, metaData);
+            
+                UploadTask.on("state-changed", (snapshot) =>{
+                    var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    proglab.innerHTML = "Upload"+progress + "%";
+                },
+            
+                (error) => {
+                    aler("error: image not uploaded!");
+                },
+            
+                ()=>{
+                    getDownloadURL(UploadTask.snapshot.ref).then((downloadURL)=>{
+                        SaveURLtoFireStore(downloadURL);
+                    });
+                }
+                );
+            }else{
+                alert("Invalid test name!")
+            }
+        }
+//---------------------Functions for FIRESTIORE DATABASE----------------------//
+    
+        async function SaveURLtoFireStore(url){
+            var name = namebox.value;
+            var ext = extlab.innerHTML;
+        
+            var ref = doc(clouddb, testname.value+"/"+name);
+        
+            await setDoc(ref,{
+                ImageName: (name+ext),
+                ImageURL: url
+            })
+        }
+
+        function LoginProcess(){
+            const dbref = ref(db);
+
+            get(child(dbref, "Teachers/"+teacher.value)).then((snapshot)=>{
+                if(snapshot.exists()){
+                    var DBname = snapshot.val().Name;
+                    var DBpassword = snapshot.val().Password;
+
+                    if (DBname == teacher.value && DBpassword == Tcode.value){
+
+                        document.querySelector("#loginTeacher").style.display = 'none';
+                        document.querySelector(".imgname-container").style.display = "block";
+                        document.querySelector(".second-page").style.display = "block";
+                        document.querySelector(".button-container").style.display = "block";
+                        document.querySelector("#username").style.display = "block";
+
+                        var messageSentDiv = document.querySelector("#username");
+                        messageSentDiv.textContent = "Ste prihlásený ako:\n"+teacher.value;
+
+                    } else {
+                        alert("Invalid password")
+                        window.location.reload();
+                    }
+                    
+                } else {
+                    alert('No user found');
+                    window.location.reload();
+                }
+            })
+            .catch((error)=>{
+                alert("unsucessful, error"+error)
+            }); 
+        }
+    
+        UpBtn.onclick = UploadProcess;
+        LogBtn.onclick = LoginProcess;
+
     </script>
+
 </body>
 </html>
